@@ -23,6 +23,7 @@ struct AG
     fit_function::Function
     selection_function::Function
     cross_function::Function
+    mut_function::Function
 end
 
 function fitness(gene::Array{Float64, 1})::Float64
@@ -83,6 +84,7 @@ function run_ag(ag::AG)
     #    println(ag.fit_function.(gen))
     #end
 
+    current_gen = 0
     while true
         println("Geração atual: $(gen)")
         println("Fit geração atual: $(ag.fit_function.(gen))")
@@ -114,9 +116,22 @@ function run_ag(ag::AG)
             push!(new_gen, mother)
         end
 
+        for i in 1:length(new_gen)
+            if rand() < ag.mut_prob
+                println("O gene $(new_gen[i]) será mutado...")
+
+                ag.mut_function(new_gen[i])
+            end
+        end
+
         println("Nova geração: $(new_gen)")
         println("Fit nova geração: $(ag.fit_function.(new_gen))")
-        break
+        
+        current_gen += 1
+
+        if current_gen == ag.max_gen
+            break
+        end
     end
 end
 
@@ -125,14 +140,15 @@ function main()
 
     pop_size = 32
     cross_prob = 0.2
-    mut_prob = 0.1
+    mut_prob = 0.4
     gen_size = 2
-    max_gen = 10
+    max_gen = 10000
     fit_function = fitness
     selection_funtion = roulette
     cross_function = crossover
+    mut_function = uniform_mutation
     
-    ag = AG(pop_size, cross_prob, mut_prob, gen_size, max_gen, fit_function, selection_funtion, cross_function)
+    ag = AG(pop_size, cross_prob, mut_prob, gen_size, max_gen, fit_function, selection_funtion, cross_function, mut_function)
     run_ag(ag)
 end
 
