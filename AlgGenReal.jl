@@ -85,23 +85,24 @@ function run_ag(ag::AG)
     #end
 
     current_gen = 0
+    parents = gen[ag.selection_function(gen, ag.fit_function, ag.pop_size)]
     while true
         println("Geração atual: $(gen)")
         println("Fit geração atual: $(ag.fit_function.(gen))")
-        parents = gen[ag.selection_function(gen, ag.fit_function, 8)]
+        parents = parents[ag.selection_function(parents, ag.fit_function, ag.pop_size)]
+        # parents = gen[ag.selection_function(gen, ag.fit_function, 8)]
         
         # println("pais: $(parents)")
         # println("fitness pais: $(ag.fit_function.(parents))")
         parents_pair = ntaker(parents, 2, 0)
 
         new_gen = []
-        for i in 1:length(parents_pair)
+        for i in 1:length(parents_pair * 2)
             pair = parents_pair[i]
             # println("pair: $(pair)")
 
             father = pair[1]
             mother = pair[2]
-
 
             if rand() < ag.cross_prob
                 println("O par $(pair) sofrerá crossover")
@@ -140,7 +141,7 @@ function main()
 
     pop_size = 32
     cross_prob = 0.2
-    mut_prob = 0.4
+    mut_prob = 0.5
     gen_size = 2
     max_gen = 10000
     fit_function = fitness
